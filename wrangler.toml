@@ -1,0 +1,19 @@
+name = "diet-tracker"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Replace with your actual values after Supabase project creation
+SUPABASE_URL = "https://your-project.supabase.co"
+REPORT_BASE_URL = "https://your-project.vercel.app"
+
+# Secrets (set via: wrangler secret put <KEY>)
+# SUPABASE_ANON_KEY
+# TELEGRAM_BOT_TOKEN
+# GEMINI_API_KEY
+# ADMIN_CHAT_ID
+
+[triggers]
+# UTC times: 00:00 = 08:00 Asia/Taipei, 13:00 = 21:00 Asia/Taipei
+crons = ["0 0 * * *", "0 13 * * *"]
