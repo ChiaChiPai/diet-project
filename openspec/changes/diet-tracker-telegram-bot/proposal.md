@@ -19,6 +19,7 @@
 - `exercise-logging`: 透過 `/sport` 指令記錄運動種類與時間
 - `daily-reminder`: Cron 定時檢查當日紀錄缺漏，透過 Bot 推送提醒
 - `report-generation`: 產生 7 天唯讀報告頁連結，含體重折線圖、餐點照片與摘要
+- `user-management`: 白名單制多人支援，管理員可新增/移除允許使用者
 
 ### Modified Capabilities
 
@@ -30,4 +31,5 @@
 - 新增 Supabase（PostgreSQL + Storage）
 - 新增 Gemini Vision API 依賴
 - 報告頁部署至 Vercel（靜態 HTML）
+- 新增 `users` 資料表與白名單 middleware
 - 無既有系統需修改

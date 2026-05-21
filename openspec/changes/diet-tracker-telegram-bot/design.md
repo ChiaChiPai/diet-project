@@ -19,6 +19,60 @@
 
 ## Decisions
 
+### 資料模型（完整）
+
+```sql
+-- 使用者白名單
+users (
+  telegram_chat_id  bigint primary key,
+  name              text,
+  is_allowed        boolean default true,
+  created_at        timestamptz
+)
+
+-- 體重
+weight_logs (
+  id          uuid primary key,
+  user_id     bigint references users(telegram_chat_id),
+  date        date,
+  kg          numeric(4,1),
+  created_at  timestamptz
+)
+
+-- 飲食
+meal_logs (
+  id               uuid primary key,
+  user_id          bigint references users(telegram_chat_id),
+  date             date,
+  meal_type        text check (meal_type in ('breakfast','lunch','dinner','snack')),
+  description      text,
+  photo_url        text,
+  gemini_analysis  jsonb,
+  created_at       timestamptz
+)
+
+-- 運動
+exercise_logs (
+  id                uuid primary key,
+  user_id           bigint references users(telegram_chat_id),
+  date              date,
+  exercise_type     text,
+  duration_minutes  int,
+  created_at        timestamptz
+)
+
+-- 報告 token
+report_tokens (
+  id          uuid primary key,
+  user_id     bigint references users(telegram_chat_id),
+  token       text unique,
+  date_from   date,
+  date_to     date,
+  expires_at  timestamptz,
+  created_at  timestamptz
+)
+```
+
 ### Bot Framework：grammY over Telegraf
 grammY 是 TypeScript-first、使用 middleware 架構、支援 Cloudflare Workers 部署。Telegraf 較老、型別支援弱。選 grammY。
 
@@ -36,6 +90,13 @@ grammY 是 TypeScript-first、使用 middleware 架構、支援 Cloudflare Worke
 
 ### Gemini Model：gemini-2.0-flash
 速度快、成本低、Vision 能力足夠識別台灣常見食物。若辨識結果不滿意，使用者可透過 Bot 修改。
+
+### 多人白名單：Supabase users 資料表 over 環境變數
+白名單存 Supabase `users` 資料表（telegram_chat_id bigint, name text, is_allowed boolean）。相較硬編碼在環境變數，可在 Supabase dashboard 或透過管理員指令動態新增/移除，無需重新部署。
+
+管理員身份由 `ADMIN_CHAT_ID` 環境變數定義（只有一個管理員）。管理指令：`/adduser <chat_id> <name>`、`/removeuser <chat_id>`。
+
+Bot middleware 每次收到訊息查詢 `users` 表，`is_allowed=false` 或不存在 → 靜默忽略（不回應）。
 
 ## Risks / Trade-offs
 
