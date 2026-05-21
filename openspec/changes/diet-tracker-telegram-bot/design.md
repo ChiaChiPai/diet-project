@@ -107,5 +107,8 @@ Bot middleware 每次收到訊息查詢 `users` 表，`is_allowed=false` 或不�
 
 ## Open Questions
 
-- 報告頁域名：使用 Vercel 預設子域還是自訂域？（建議先用預設，之後再換）
 - Gemini API 費用上限設定：建議在 Google Cloud Console 設每月 budget alert
+
+## Decisions (resolved)
+
+- 報告頁域名：使用 Vercel 預設子域（`*.vercel.app`），不設自訂域
