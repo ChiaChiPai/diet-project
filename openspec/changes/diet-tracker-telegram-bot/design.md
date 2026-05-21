@@ -107,7 +107,7 @@ Bot middleware 每次收到訊息查詢 `users` 表，`is_allowed=false` 或不�
 
 ## Open Questions
 
-- Gemini API 費用上限設定：建議在 Google Cloud Console 設每月 budget alert
+- Gemini API 費用上限設定：已加入 tasks 1.5，實作時提醒設置
 
 ## Decisions (resolved)
 

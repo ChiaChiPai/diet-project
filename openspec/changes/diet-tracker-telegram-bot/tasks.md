@@ -4,6 +4,7 @@
 - [ ] 1.2 設定 wrangler.toml（Bot + API 共用 Workers service）
 - [ ] 1.3 建立 Supabase 專案，取得 DB URL 與 anon key
 - [ ] 1.4 設定 Cloudflare Workers Secrets（Telegram token、Supabase URL/key、Gemini API key、ADMIN_CHAT_ID）
+- [ ] 1.5 在 Google Cloud Console 為 Gemini API 設定每月 budget alert（避免費用爆衝）
 
 ## 2. 資料庫
 
