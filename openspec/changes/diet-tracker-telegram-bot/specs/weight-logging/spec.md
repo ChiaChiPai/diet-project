@@ -11,6 +11,6 @@
 - **WHEN** 使用者傳送 `/weight abc` 或未帶數值
 - **THEN** Bot 回覆「格式：/weight 65.2」
 
-#### Scenario: 當日重複記錄
-- **WHEN** 使用者當日已記錄體重，再次傳送 `/weight`
-- **THEN** 系統以新值覆蓋，Bot 回覆「體重已更新為 XX.Xkg ✓」
+#### Scenario: 當日重複記錄（覆蓋）
+- **WHEN** 使用者當日已記錄體重，再次傳送 `/weight <數值>`
+- **THEN** 系統以新值 upsert（依 user_id + date unique constraint），Bot 回覆「體重 XX.Xkg 記錄成功 ✓」
