@@ -117,7 +117,12 @@
           html += `
             <div class="border-t border-gray-50 pt-2">
               <p class="text-sm font-medium text-gray-700">${label}：${meal.description || '（未填寫）'}</p>
-              ${meal.photo_url ? `<img src="${meal.photo_url}" loading="lazy" class="mt-2 rounded-xl w-full max-h-52 object-cover" />` : ''}
+              ${meal.photo_url ? `
+                <div class="mt-2 cursor-pointer group" onclick="openLightbox('${meal.photo_url}')">
+                  <img src="${meal.photo_url}" loading="lazy" class="rounded-xl w-full max-h-80 object-contain bg-gray-50 group-hover:opacity-90 transition-opacity" />
+                  <p class="text-xs text-center text-gray-400 mt-1">🔍 點擊放大</p>
+                </div>
+              ` : ''}
             </div>
           `
         }
@@ -134,7 +139,28 @@
       }
     }
 
+    // Lightbox
+    function openLightbox(src) {
+      const overlay = document.getElementById('lightbox')
+      document.getElementById('lightbox-img').src = src
+      overlay.classList.remove('hidden')
+      document.body.style.overflow = 'hidden'
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.add('hidden')
+      document.body.style.overflow = ''
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox() })
+
     load()
   </script>
+
+  <!-- Lightbox overlay -->
+  <div id="lightbox" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" class="max-w-full max-h-full rounded-2xl object-contain shadow-2xl" onclick="event.stopPropagation()" />
+    <button onclick="closeLightbox()" class="absolute top-4 right-4 text-white text-3xl leading-none bg-black/40 rounded-full w-10 h-10 flex items-center justify-center hover:bg-black/60">✕</button>
+  </div>
 </body>
 </html>
