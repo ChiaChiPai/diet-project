@@ -13,6 +13,26 @@ export async function handleReport(
   const token = nanoid(32)
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
 
+  // Clean up tokens older than 30 days
+  await supabase
+    .from('report_tokens')
+    .delete()
+    .eq('user_id', userId)
+    .lt('date_to', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10))
+
+  // Reuse today's token if it exists
+  const { data: existing } = await supabase
+    .from('report_tokens')
+    .select('token')
+    .eq('user_id', userId)
+    .eq('date_to', dateTo)
+    .single()
+
+  if (existing) {
+    await ctx.reply(`報告連結（48小時有效）：\n${reportBaseUrl}/report/${existing.token}`)
+    return
+  }
+
   const { error } = await supabase.from('report_tokens').insert({
     user_id: userId,
     token,
