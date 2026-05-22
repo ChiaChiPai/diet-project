@@ -3,11 +3,12 @@ import type { Env } from '../types'
 import { createClient } from '../lib/supabase'
 import { createAuthMiddleware } from './middleware/auth'
 import { handleAddUser, handleRemoveUser } from './commands/admin'
-import { handleWeight } from './commands/weight'
-import { handleSport } from './commands/sport'
+import { handleWeight, recordWeight } from './commands/weight'
+import { handleSport, recordSport } from './commands/sport'
 import { handleToday } from './commands/today'
 import { handleReport } from './commands/report'
 import { handleEdit } from './commands/edit'
+import { handleClear } from './commands/clear'
 import { handlePhoto } from './handlers/photo'
 
 function confirmKeyboard(mealLogId: string): InlineKeyboard {
@@ -33,6 +34,7 @@ export function setupBot(bot: Bot, env: Env): void {
   bot.command('today', ctx => handleToday(ctx, supabase))
   bot.command('report', ctx => handleReport(ctx, supabase, env.REPORT_BASE_URL))
   bot.command('edit', ctx => handleEdit(ctx, supabase))
+  bot.command('clear', ctx => handleClear(ctx, supabase))
 
   // Photo → Gemini → meal type selection
   bot.on('message:photo', ctx => handlePhoto(ctx, supabase, env.GEMINI_API_KEY))
@@ -116,6 +118,30 @@ export function setupBot(bot: Bot, env: Env): void {
       .select('state, data')
       .eq('user_id', ctx.from.id)
       .single()
+
+    if (session?.state === 'awaiting_weight') {
+      const kg = parseFloat(ctx.message.text)
+      if (isNaN(kg)) {
+        await ctx.reply('請輸入數字，例如：65.2')
+        return
+      }
+      await supabase.from('bot_sessions').delete().eq('user_id', ctx.from.id)
+      await recordWeight(ctx, supabase, kg)
+      return
+    }
+
+    if (session?.state === 'awaiting_sport') {
+      const parts = ctx.message.text.trim().split(' ')
+      const minutes = parseInt(parts[parts.length - 1], 10)
+      if (parts.length < 2 || isNaN(minutes)) {
+        await ctx.reply('格式：跑步 30')
+        return
+      }
+      const exerciseType = parts.slice(0, parts.length - 1).join(' ')
+      await supabase.from('bot_sessions').delete().eq('user_id', ctx.from.id)
+      await recordSport(ctx, supabase, exerciseType, minutes)
+      return
+    }
 
     if (session?.state === 'awaiting_correction') {
       const mealLogId = (session.data as { meal_log_id: string }).meal_log_id
