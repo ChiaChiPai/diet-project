@@ -21,12 +21,14 @@ export async function handleReport(
     .lt('date_to', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10))
 
   // Reuse today's token if it exists
-  const { data: existing } = await supabase
+  const { data: rows } = await supabase
     .from('report_tokens')
     .select('token')
     .eq('user_id', userId)
     .eq('date_to', dateTo)
-    .single()
+    .limit(1)
+
+  const existing = rows?.[0]
 
   if (existing) {
     await ctx.reply(`報告連結（48小時有效）：\n${reportBaseUrl}/report/${existing.token}`)
