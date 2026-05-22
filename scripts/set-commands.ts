@@ -8,6 +8,7 @@ if (!token) {
 const commands = [
   { command: 'weight', description: '記錄體重 — /weight 65.2' },
   { command: 'sport',  description: '記錄運動 — /sport 跑步 30' },
+  { command: 'meal',   description: '用文字記錄飲食（無需照片）' },
   { command: 'today',  description: '查看今日摘要' },
   { command: 'report', description: '產生近7天報告連結' },
   { command: 'edit',   description: '修改今日飲食記錄內容' },

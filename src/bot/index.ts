@@ -8,6 +8,7 @@ import { handleSport, recordSport } from './commands/sport'
 import { handleToday } from './commands/today'
 import { handleReport } from './commands/report'
 import { handleEdit } from './commands/edit'
+import { handleMeal } from './commands/meal'
 import { handleClear } from './commands/clear'
 import { handlePhoto, buildDetectionCaption } from './handlers/photo'
 import { analyzeFood } from '../lib/gemini'
@@ -35,6 +36,7 @@ export function setupBot(bot: Bot, env: Env): void {
   bot.command('today', ctx => handleToday(ctx, supabase))
   bot.command('report', ctx => handleReport(ctx, supabase, env.REPORT_BASE_URL))
   bot.command('edit', ctx => handleEdit(ctx, supabase))
+  bot.command('meal', ctx => handleMeal(ctx, supabase))
   bot.command('clear', ctx => handleClear(ctx, supabase))
 
   // Photo → check if in edit flow, else Gemini → meal type selection
@@ -111,6 +113,22 @@ export function setupBot(bot: Bot, env: Env): void {
     }
 
     await handlePhoto(ctx, supabase, env.GEMINI_API_KEY)
+  })
+
+  // Meal type selected via /meal text flow (callback: mt_text:{mealType})
+  bot.callbackQuery(/^mt_text:/, async ctx => {
+    const mealType = ctx.callbackQuery.data.slice(8)
+    const mealLabel = { breakfast: '早餐', lunch: '午餐', dinner: '晚餐', snack: '點心' }[mealType] ?? mealType
+
+    await supabase.from('bot_sessions').upsert({
+      user_id: ctx.from.id,
+      state: 'awaiting_meal_text',
+      data: { meal_type: mealType },
+      updated_at: new Date().toISOString(),
+    })
+
+    await ctx.answerCallbackQuery()
+    await ctx.reply(`${mealLabel} — 請輸入飲食內容：`)
   })
 
   // Meal type selected (callback: mt:{mealType}:{mealLogId})
@@ -268,6 +286,30 @@ export function setupBot(bot: Bot, env: Env): void {
       .select('state, data')
       .eq('user_id', ctx.from.id)
       .single()
+
+    if (session?.state === 'awaiting_meal_text') {
+      const { meal_type } = session.data as { meal_type: string }
+      const today = new Date().toISOString().slice(0, 10)
+
+      await supabase.from('meal_logs').delete()
+        .eq('user_id', ctx.from.id)
+        .eq('date', today)
+        .eq('meal_type', meal_type)
+        .eq('confirmed', true)
+
+      await supabase.from('meal_logs').insert({
+        user_id: ctx.from.id,
+        date: today,
+        meal_type,
+        description: ctx.message.text,
+        confirmed: true,
+        photo_url: null,
+      })
+
+      await supabase.from('bot_sessions').delete().eq('user_id', ctx.from.id)
+      await ctx.reply('記錄完成 ✓')
+      return
+    }
 
     if (session?.state === 'awaiting_weight') {
       const kg = parseFloat(ctx.message.text)
