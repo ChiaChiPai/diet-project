@@ -5,8 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 
 [vars]
 # Replace with your actual values after Supabase project creation
-SUPABASE_URL = "https://your-project.supabase.co"
-REPORT_BASE_URL = "https://your-project.vercel.app"
+SUPABASE_URL = "https://ebcxtroybrhuzbmwjooh.supabase.co"
+REPORT_BASE_URL = "https://diet-project-ten.vercel.app"
 
 # Secrets (set via: wrangler secret put <KEY>)
 # SUPABASE_ANON_KEY

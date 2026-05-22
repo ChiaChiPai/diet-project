@@ -4,10 +4,15 @@ import type { GeminiAnalysis } from '../types'
 export async function analyzeFood(imageBuffer: ArrayBuffer, apiKey: string): Promise<GeminiAnalysis> {
   try {
     const genAI = new GoogleGenAI({ apiKey })
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(imageBuffer)))
+    const bytes = new Uint8Array(imageBuffer)
+    let binary = ''
+    for (let i = 0; i < bytes.length; i += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + 8192))
+    }
+    const base64 = btoa(binary)
 
     const response = await genAI.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.1-flash-lite',
       contents: [
         {
           role: 'user',
@@ -31,7 +36,8 @@ export async function analyzeFood(imageBuffer: ArrayBuffer, apiKey: string): Pro
       foods: Array.isArray(parsed.foods) ? parsed.foods : [],
       estimated_calories: typeof parsed.estimated_calories === 'number' ? parsed.estimated_calories : undefined,
     }
-  } catch {
+  } catch (err) {
+    console.error('[gemini] analyzeFood error:', err)
     return { foods: [] }
   }
 }
