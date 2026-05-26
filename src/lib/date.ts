@@ -23,8 +23,9 @@ export function isValidBackfillDate(dateStr: string): { valid: boolean; error?: 
   if (dateStr > today) {
     return { valid: false, error: '不可設定未來日期' }
   }
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-    .toLocaleDateString('sv-SE', { timeZone: TAIPEI_TZ })
+  const d = new Date(today + 'T00:00:00')
+  d.setDate(d.getDate() - 30)
+  const thirtyDaysAgo = d.toISOString().slice(0, 10)
   if (dateStr < thirtyDaysAgo) {
     return { valid: false, error: '最多補記 30 天前的資料' }
   }

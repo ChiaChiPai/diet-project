@@ -14,10 +14,20 @@ describe('isValidBackfillDate', () => {
     expect(isValidBackfillDate(future)).toEqual({ valid: false, error: '不可設定未來日期' })
   })
 
+  it('accepts exactly 30 days ago', () => {
+    const today = todayTaipei()
+    const d = new Date(today + 'T00:00:00')
+    d.setDate(d.getDate() - 30)
+    const thirtyDaysAgo = d.toISOString().slice(0, 10)
+    expect(isValidBackfillDate(thirtyDaysAgo)).toEqual({ valid: true })
+  })
+
   it('rejects dates older than 30 days', () => {
-    const old = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000)
-      .toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' })
-    expect(isValidBackfillDate(old)).toEqual({ valid: false, error: '最多補記 30 天前的資料' })
+    const today = todayTaipei()
+    const d = new Date(today + 'T00:00:00')
+    d.setDate(d.getDate() - 31)
+    const thirtyOneDaysAgo = d.toISOString().slice(0, 10)
+    expect(isValidBackfillDate(thirtyOneDaysAgo)).toEqual({ valid: false, error: '最多補記 30 天前的資料' })
   })
 
   it('accepts valid past dates within 30 days', () => {
