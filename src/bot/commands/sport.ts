@@ -31,13 +31,17 @@ export async function handleSport(ctx: Context, supabase: SupabaseClient): Promi
   const parts = ctx.message?.text?.split(' ') ?? []
 
   if (parts.length < 3) {
+    const date = await getActiveDate(ctx.from!.id, supabase)
+    const prompt = date !== todayTaipei()
+      ? `補記 ${date} — 請輸入運動類型和時間，例如：跑步 30`
+      : '請輸入運動類型和時間，例如：跑步 30'
     await supabase.from('bot_sessions').upsert({
       user_id: ctx.from!.id,
       state: 'awaiting_sport',
       data: {},
       updated_at: new Date().toISOString(),
     })
-    await ctx.reply('請輸入運動類型和時間，例如：跑步 30')
+    await ctx.reply(prompt)
     return
   }
 

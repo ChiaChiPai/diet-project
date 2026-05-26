@@ -24,13 +24,17 @@ export async function handleWeight(ctx: Context, supabase: SupabaseClient): Prom
   const kg = parseFloat(parts[1] ?? '')
 
   if (isNaN(kg)) {
+    const date = await getActiveDate(ctx.from!.id, supabase)
+    const prompt = date !== todayTaipei()
+      ? `請輸入 ${date} 體重（kg），例如：65.2`
+      : '請輸入今日體重（kg），例如：65.2'
     await supabase.from('bot_sessions').upsert({
       user_id: ctx.from!.id,
       state: 'awaiting_weight',
       data: {},
       updated_at: new Date().toISOString(),
     })
-    await ctx.reply('請輸入今日體重（kg），例如：65.2')
+    await ctx.reply(prompt)
     return
   }
 
