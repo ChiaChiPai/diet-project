@@ -13,7 +13,7 @@ import { handleClear } from './commands/clear'
 import { handleDate } from './commands/date'
 import { handlePhoto, buildDetectionCaption } from './handlers/photo'
 import { analyzeFood } from '../lib/gemini'
-import { todayTaipei } from '../lib/date'
+import { getActiveDate, todayTaipei } from '../lib/date'
 
 function confirmKeyboard(mealLogId: string): InlineKeyboard {
   return new InlineKeyboard()
@@ -192,7 +192,8 @@ export function setupBot(bot: Bot, env: Env): void {
       .eq('user_id', userId)
 
     await ctx.answerCallbackQuery()
-    await ctx.reply('記錄完成 ✓')
+    const suffix = meal && meal.date !== todayTaipei() ? `（補記 ${meal.date}）` : ''
+    await ctx.reply(`記錄完成 ✓${suffix}`)
   })
 
   // User requests edit after Gemini analysis (callback: ed:{mealLogId})
@@ -292,17 +293,17 @@ export function setupBot(bot: Bot, env: Env): void {
 
     if (session?.state === 'awaiting_meal_text') {
       const { meal_type } = session.data as { meal_type: string }
-      const today = todayTaipei()
+      const date = await getActiveDate(ctx.from.id, supabase)
 
       await supabase.from('meal_logs').delete()
         .eq('user_id', ctx.from.id)
-        .eq('date', today)
+        .eq('date', date)
         .eq('meal_type', meal_type)
         .eq('confirmed', true)
 
       await supabase.from('meal_logs').insert({
         user_id: ctx.from.id,
-        date: today,
+        date,
         meal_type,
         description: ctx.message.text,
         confirmed: true,
@@ -310,7 +311,8 @@ export function setupBot(bot: Bot, env: Env): void {
       })
 
       await supabase.from('bot_sessions').delete().eq('user_id', ctx.from.id)
-      await ctx.reply('記錄完成 ✓')
+      const suffix = date !== todayTaipei() ? `（補記 ${date}）` : ''
+      await ctx.reply(`記錄完成 ✓${suffix}`)
       return
     }
 
