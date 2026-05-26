@@ -10,6 +10,7 @@ import { handleReport } from './commands/report'
 import { handleEdit } from './commands/edit'
 import { handleMeal } from './commands/meal'
 import { handleClear } from './commands/clear'
+import { handleDate } from './commands/date'
 import { handlePhoto, buildDetectionCaption } from './handlers/photo'
 import { analyzeFood } from '../lib/gemini'
 import { todayTaipei } from '../lib/date'
@@ -39,6 +40,7 @@ export function setupBot(bot: Bot, env: Env): void {
   bot.command('edit', ctx => handleEdit(ctx, supabase))
   bot.command('meal', ctx => handleMeal(ctx, supabase))
   bot.command('clear', ctx => handleClear(ctx, supabase))
+  bot.command('date', ctx => handleDate(ctx, supabase))
 
   // Photo → check if in edit flow, else Gemini → meal type selection
   bot.on('message:photo', async ctx => {

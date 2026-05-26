@@ -13,6 +13,7 @@ const commands = [
   { command: 'report', description: '產生近7天報告連結' },
   { command: 'edit',   description: '修改今日飲食記錄內容' },
   { command: 'clear',  description: '取消目前操作' },
+  { command: 'date', description: '補記日期 — /date 2026-05-25 或 /date 回到今日' },
 ]
 
 const res = await fetch(`https://api.telegram.org/bot${token}/setMyCommands`, {
