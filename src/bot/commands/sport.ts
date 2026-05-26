@@ -1,7 +1,7 @@
 import type { Context } from 'grammy'
 import type { SupabaseClient } from '../../lib/supabase'
 import { clearSession } from '../lib/session'
-import { todayTaipei } from '../../lib/date'
+import { getActiveDate, todayTaipei } from '../../lib/date'
 
 export async function recordSport(
   ctx: Context,
@@ -9,9 +9,10 @@ export async function recordSport(
   exerciseType: string,
   minutes: number
 ): Promise<void> {
+  const date = await getActiveDate(ctx.from!.id, supabase)
   const { error } = await supabase.from('exercise_logs').insert({
     user_id: ctx.from!.id,
-    date: todayTaipei(),
+    date,
     exercise_type: exerciseType,
     duration_minutes: minutes,
   })
@@ -21,12 +22,12 @@ export async function recordSport(
     return
   }
 
-  await ctx.reply(`${exerciseType} ${minutes} 分鐘記錄成功 ✓`)
+  const suffix = date !== todayTaipei() ? `（補記 ${date}）` : ''
+  await ctx.reply(`${exerciseType} ${minutes} 分鐘記錄成功 ✓${suffix}`)
 }
 
 export async function handleSport(ctx: Context, supabase: SupabaseClient): Promise<void> {
   await clearSession(ctx.from!.id, supabase)
-  // /sport 跑步 30  →  parts = ['/sport', '跑步', '30']
   const parts = ctx.message?.text?.split(' ') ?? []
 
   if (parts.length < 3) {
