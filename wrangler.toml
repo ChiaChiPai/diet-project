@@ -15,5 +15,5 @@ REPORT_BASE_URL = "https://diet-project-ten.vercel.app"
 # ADMIN_CHAT_ID
 
 [triggers]
-# UTC times: 00:00 = 08:00 Asia/Taipei, 13:00 = 21:00 Asia/Taipei
-crons = ["0 0 * * *", "0 13 * * *"]
+# UTC times: 22:00 = 06:00 Asia/Taipei, 13:00 = 21:00 Asia/Taipei
+crons = ["0 22 * * *", "0 13 * * *"]

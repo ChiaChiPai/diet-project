@@ -1,5 +1,6 @@
 import type { Env } from '../types'
 import { createClient } from '../lib/supabase'
+import { todayTaipei } from '../lib/date'
 
 const MEAL_LABELS: Record<string, string> = {
   breakfast: '早餐',
@@ -10,7 +11,7 @@ const MEAL_LABELS: Record<string, string> = {
 // Runs at 13:00 UTC (21:00 Asia/Taipei)
 export async function eveningCron(env: Env): Promise<void> {
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayTaipei()
 
   const { data: users } = await supabase
     .from('users')

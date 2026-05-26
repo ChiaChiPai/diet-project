@@ -2,6 +2,7 @@ import type { Context } from 'grammy'
 import { InlineKeyboard } from 'grammy'
 import type { SupabaseClient } from '../../lib/supabase'
 import type { MealType } from '../../types'
+import { todayTaipei } from '../../lib/date'
 
 const MEAL_LABELS: Record<MealType, string> = {
   breakfast: '早餐',
@@ -12,7 +13,7 @@ const MEAL_LABELS: Record<MealType, string> = {
 
 export async function handleEdit(ctx: Context, supabase: SupabaseClient): Promise<void> {
   const userId = ctx.from!.id
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayTaipei()
 
   const { data: meals } = await supabase
     .from('meal_logs')

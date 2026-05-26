@@ -12,6 +12,7 @@ import { handleMeal } from './commands/meal'
 import { handleClear } from './commands/clear'
 import { handlePhoto, buildDetectionCaption } from './handlers/photo'
 import { analyzeFood } from '../lib/gemini'
+import { todayTaipei } from '../lib/date'
 
 function confirmKeyboard(mealLogId: string): InlineKeyboard {
   return new InlineKeyboard()
@@ -289,7 +290,7 @@ export function setupBot(bot: Bot, env: Env): void {
 
     if (session?.state === 'awaiting_meal_text') {
       const { meal_type } = session.data as { meal_type: string }
-      const today = new Date().toISOString().slice(0, 10)
+      const today = todayTaipei()
 
       await supabase.from('meal_logs').delete()
         .eq('user_id', ctx.from.id)

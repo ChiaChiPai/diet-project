@@ -3,6 +3,7 @@ import { InlineKeyboard } from 'grammy'
 import type { SupabaseClient } from '../../lib/supabase'
 import { analyzeFood } from '../../lib/gemini'
 import type { GeminiAnalysis } from '../../types'
+import { todayTaipei } from '../../lib/date'
 
 export const MEAL_SELECT_LABELS = {
   breakfast: '早餐',
@@ -36,7 +37,7 @@ export async function handlePhoto(
   if (!photo) return
 
   const userId = ctx.from!.id
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayTaipei()
 
   await ctx.reply('分析中... ⏳')
 

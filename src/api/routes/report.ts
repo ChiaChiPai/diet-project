@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import type { SupabaseClient } from '../../lib/supabase'
 import type { MealType } from '../../types'
 import { nanoid } from 'nanoid'
+import { dateRangeTaipei } from '../../lib/date'
 
 export function createReportRouter(supabase: SupabaseClient, reportBaseUrl: string) {
   const router = new Hono()
@@ -75,8 +76,7 @@ export function createReportRouter(supabase: SupabaseClient, reportBaseUrl: stri
   // POST /api/report — create a report token and return URL
   router.post('/', async (c) => {
     const { user_id } = await c.req.json<{ user_id: number }>()
-    const dateTo = new Date().toISOString().slice(0, 10)
-    const dateFrom = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    const { dateTo, dateFrom } = dateRangeTaipei(6)
     const token = nanoid(32)
     const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
 

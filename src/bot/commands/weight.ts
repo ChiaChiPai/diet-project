@@ -1,15 +1,12 @@
 import type { Context } from 'grammy'
 import type { SupabaseClient } from '../../lib/supabase'
 import { clearSession } from '../lib/session'
-
-function todayDate(): string {
-  return new Date().toISOString().slice(0, 10)
-}
+import { todayTaipei } from '../../lib/date'
 
 export async function recordWeight(ctx: Context, supabase: SupabaseClient, kg: number): Promise<void> {
   const { error } = await supabase
     .from('weight_logs')
-    .upsert({ user_id: ctx.from!.id, date: todayDate(), kg }, { onConflict: 'user_id,date' })
+    .upsert({ user_id: ctx.from!.id, date: todayTaipei(), kg }, { onConflict: 'user_id,date' })
 
   if (error) {
     await ctx.reply('記錄失敗，請稍後再試')

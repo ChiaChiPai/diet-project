@@ -1,10 +1,7 @@
 import type { Context } from 'grammy'
 import type { SupabaseClient } from '../../lib/supabase'
 import { clearSession } from '../lib/session'
-
-function todayDate(): string {
-  return new Date().toISOString().slice(0, 10)
-}
+import { todayTaipei } from '../../lib/date'
 
 export async function recordSport(
   ctx: Context,
@@ -14,7 +11,7 @@ export async function recordSport(
 ): Promise<void> {
   const { error } = await supabase.from('exercise_logs').insert({
     user_id: ctx.from!.id,
-    date: todayDate(),
+    date: todayTaipei(),
     exercise_type: exerciseType,
     duration_minutes: minutes,
   })

@@ -31,7 +31,7 @@ export default {
 
   async scheduled(event: ScheduledEvent, env: Env): Promise<void> {
     const hour = new Date(event.scheduledTime).getUTCHours()
-    if (hour === 0) await morningCron(env)
+    if (hour === 22) await morningCron(env)
     if (hour === 13) await eveningCron(env)
   },
 }
