@@ -7,7 +7,7 @@ import { dateRangeTaipei } from '../../lib/date'
 export function createReportRouter(supabase: SupabaseClient, reportBaseUrl: string) {
   const router = new Hono()
 
-  // GET /api/report/:token — return 7-day data for nutritionist report page
+  // GET /api/report/:token — return 14-day data for nutritionist report page
   router.get('/:token', async (c) => {
     const token = c.req.param('token')
 
@@ -76,7 +76,7 @@ export function createReportRouter(supabase: SupabaseClient, reportBaseUrl: stri
   // POST /api/report — create a report token and return URL
   router.post('/', async (c) => {
     const { user_id } = await c.req.json<{ user_id: number }>()
-    const { dateTo, dateFrom } = dateRangeTaipei(6)
+    const { dateTo, dateFrom } = dateRangeTaipei(13)
     const token = nanoid(32)
     const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
 

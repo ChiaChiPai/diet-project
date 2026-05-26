@@ -9,7 +9,7 @@ export async function handleReport(
   reportBaseUrl: string
 ): Promise<void> {
   const userId = ctx.from!.id
-  const { dateTo, dateFrom } = dateRangeTaipei(6)
+  const { dateTo, dateFrom } = dateRangeTaipei(13)
   const token = nanoid(32)
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
 
